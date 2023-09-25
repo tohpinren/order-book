@@ -266,3 +266,50 @@ void Limit::rightRotate() {
 float Limit::getPrice() const {
     return price;
 }
+
+void Limit::removeOrder(Order *order) {
+    if (this->headOrder == order && this->tailOrder == order) {
+        this->headOrder = nullptr;
+        this->tailOrder = nullptr;
+    } else if (this->headOrder == order) {
+        this->headOrder = order->nextOrder;
+        order->nextOrder->prevOrder = nullptr;
+    } else if (this->tailOrder == order) {
+        this->tailOrder = order->prevOrder;
+        order->prevOrder->nextOrder = nullptr;
+    } else {
+        order->prevOrder->nextOrder = order->nextOrder;
+        order->nextOrder->prevOrder = order->prevOrder;
+    }
+    this->size -= order->quantity;
+    order->parentLimit = nullptr;
+}
+
+Order *Limit::getNextInsideOrder(bool isBuy) {
+    if (this->headOrder != nullptr) {
+        return this->headOrder;
+    }
+    if (isBuy) {
+        /*
+         * Find next highest buy limit. If limit contained highest order, it must be the bottom right of the tree.
+         * It will not have any right children. Since tree is balanced, limit will have at most a height 0 left child.
+         * Next highest buy limit will be either the parent or it's left child.
+         */
+        if (this->leftChild == nullptr) {
+            return this->parent->getHeadOrder();
+        } else {
+            return this->leftChild->getHeadOrder();
+        }
+    } else {
+        /*
+         * Find next lowest sell limit. If limit contained lowest order, it must be the bottom left of the tree.
+         * It will not have any left children. Since tree is balanced, limit will have at most a height 0 right child.
+         * Next lowest sell limit will be either the parent or it's right child.
+         */
+        if (this->rightChild == nullptr) {
+            return this->parent->getHeadOrder();
+        } else {
+            return this->rightChild->getHeadOrder();
+        }
+    }
+}

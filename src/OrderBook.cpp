@@ -64,6 +64,11 @@ void OrderBook::addOrder(float price, int quantity, bool isBuy) {
             Limit *limit = buyLimits->at(price);
             limit->addOrder(newOrder);
         }
+
+        // If order is highest buy, update highest buy
+        if (highestBuy == nullptr || price > highestBuy->getPrice()) {
+            highestBuy = newOrder;
+        }
     } else {
         Order *newOrder = new Order(currSellOrdersId, price, quantity, isBuy, timeNow);
         sellOrders->insert(std::make_pair(currSellOrdersId, newOrder));
@@ -88,41 +93,78 @@ void OrderBook::addOrder(float price, int quantity, bool isBuy) {
             Limit *limit = sellLimits->at(price);
             limit->addOrder(newOrder);
         }
+
+        // If order is lowest sell, update lowest sell
+        if (lowestSell == nullptr || price < lowestSell->getPrice()) {
+            lowestSell = newOrder;
+        }
     }
 }
 
+/**
+ * Cancels an order by removing from Limit. If order does not exist, prints error message.
+ * If Limit is empty, Limit is not removed because assuming high volume of orders, Limit will be filled again.
+ *
+ * @param order Order to be cancelled.
+ */
 void OrderBook::cancelOrder(Order *order) {
     if (order->isBuy()) {
         // Check if order exists
+        if (buyOrders->find(order->getId()) == buyOrders->end()) {
+            std::cout << "Order does not exist." << std::endl;
+            return;
+        }
 
         // Remove order from limit
+        Limit *limit = buyLimits->at(order->getPrice());
+        limit->removeOrder(order);
 
         // If order is highest buy, update highest buy
-
-        // If limit is empty, remove limit from tree
-
-        // If tree is empty, remove tree
+        if (order == highestBuy) {
+            highestBuy = limit->getNextInsideOrder(true);
+        }
 
         // Remove order from orders map
-
+        buyOrders->erase(order->getId());
 
     } else {
         // Check if order exists
+        if (sellOrders->find(order->getId()) == sellOrders->end()) {
+            std::cout << "Order does not exist." << std::endl;
+            return;
+        }
 
         // Remove order from limit
+        Limit *limit = sellLimits->at(order->getPrice());
+        limit->removeOrder(order);
 
         // If order is lowest sell, update lowest sell
-
-        // If limit is empty, remove limit from tree
-
-        // If tree is empty, remove tree
+        if (order == lowestSell) {
+            lowestSell = limit->getNextInsideOrder(false);
+        }
 
         // Remove order from orders map
+        sellOrders->erase(order->getId());
 
     }
 }
 
+/*
+ * Executes an order if highest buy is greater than or equal to lowest sell.
+ */
 void OrderBook::executeOrder() {
+    if (highestBuy == nullptr || lowestSell == nullptr || highestBuy->getPrice() < lowestSell->getPrice()) {
+        std::cout << "There are no orders to execute." << std::endl;
+        return;
+    }
+    // Remove highest buy and lowest sell from limits
+
+    // Update highest buy and lowest sell
+
+    // Remove highest buy and lowest sell from orders map
+
+    // Update volume and size of limits
+
 }
 
 void OrderBook::getVolumeAtLimitPrice(float price) {

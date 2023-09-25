@@ -45,11 +45,7 @@ public:
 
     void addOrder(Order *order);
 
-    void setHeadOrder(int *headOrder);
-
-    void setTailOrder(int *tailOrder);
-
-    void addOrder(int *order);
+    void removeOrder(Order *order);
 
     void insertLimit(Limit *limit);
 
@@ -94,6 +90,8 @@ public:
     void clearVolume();
 
     void setHeight(int height);
+
+    Order *getNextInsideOrder(bool isBuy);
 };
 
 
