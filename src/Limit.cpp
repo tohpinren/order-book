@@ -24,7 +24,7 @@ int Limit::getSize() const {
     return size;
 }
 
-float Limit::getTotalVolume() const {
+int Limit::getTotalVolume() const {
     return totalVolume;
 }
 
@@ -101,7 +101,8 @@ void Limit::addOrder(Order *order) {
         order->prevOrder = tailOrder;
         this->tailOrder = order;
     }
-    this->size += order->quantity;
+    this->size += 1;
+    this->totalVolume += order->quantity;
     order->parentLimit = this;
 }
 
@@ -281,7 +282,8 @@ void Limit::removeOrder(Order *order) {
         order->prevOrder->nextOrder = order->nextOrder;
         order->nextOrder->prevOrder = order->prevOrder;
     }
-    this->size -= order->quantity;
+    this->size -= 1;
+    this->totalVolume -= order->quantity;
     order->parentLimit = nullptr;
 }
 

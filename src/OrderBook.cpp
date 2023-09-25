@@ -20,6 +20,7 @@ OrderBook::OrderBook() {
     this->sellLimits = new std::unordered_map<float, Limit *>();
     this->currBuyOrdersId = 0;
     this->currSellOrdersId = 0;
+    this->profit = 0;
 }
 
 Limit *OrderBook::getBuyTree() {
@@ -69,6 +70,9 @@ void OrderBook::addOrder(float price, int quantity, bool isBuy) {
         if (highestBuy == nullptr || price > highestBuy->getPrice()) {
             highestBuy = newOrder;
         }
+
+        // Print order added
+        std::cout << "Buy order added: " << newOrder->getId() << " at " << newOrder->getPrice() << std::endl;
     } else {
         Order *newOrder = new Order(currSellOrdersId, price, quantity, isBuy, timeNow);
         sellOrders->insert(std::make_pair(currSellOrdersId, newOrder));
@@ -98,6 +102,9 @@ void OrderBook::addOrder(float price, int quantity, bool isBuy) {
         if (lowestSell == nullptr || price < lowestSell->getPrice()) {
             lowestSell = newOrder;
         }
+
+        // Print order added
+        std::cout << "Sell order added: " << newOrder->getId() << " at " << newOrder->getPrice() << std::endl;
     }
 }
 
@@ -119,6 +126,9 @@ void OrderBook::cancelOrder(Order *order) {
         Limit *limit = buyLimits->at(order->getPrice());
         limit->removeOrder(order);
 
+        // Print order cancelled
+        std::cout << "Buy order cancelled: " << order->getId() << " at " << order->getPrice() << std::endl;
+
         // If order is highest buy, update highest buy
         if (order == highestBuy) {
             highestBuy = limit->getNextInsideOrder(true);
@@ -126,7 +136,6 @@ void OrderBook::cancelOrder(Order *order) {
 
         // Remove order from orders map
         buyOrders->erase(order->getId());
-
     } else {
         // Check if order exists
         if (sellOrders->find(order->getId()) == sellOrders->end()) {
@@ -138,6 +147,9 @@ void OrderBook::cancelOrder(Order *order) {
         Limit *limit = sellLimits->at(order->getPrice());
         limit->removeOrder(order);
 
+        // Print order cancelled
+        std::cout << "Sell order cancelled: " << order->getId() << " at " << order->getPrice() << std::endl;
+
         // If order is lowest sell, update lowest sell
         if (order == lowestSell) {
             lowestSell = limit->getNextInsideOrder(false);
@@ -145,7 +157,6 @@ void OrderBook::cancelOrder(Order *order) {
 
         // Remove order from orders map
         sellOrders->erase(order->getId());
-
     }
 }
 
@@ -158,13 +169,24 @@ void OrderBook::executeOrder() {
         return;
     }
     // Remove highest buy and lowest sell from limits
-
-    // Update highest buy and lowest sell
+    highestBuy->parentLimit->removeOrder(highestBuy);
+    lowestSell->parentLimit->removeOrder(lowestSell);
+    this->profit += lowestSell->getPrice() - highestBuy->getPrice();
 
     // Remove highest buy and lowest sell from orders map
+    buyOrders->erase(highestBuy->getId());
+    sellOrders->erase(lowestSell->getId());
 
-    // Update volume and size of limits
+    // Print orders executed
+    std::cout << "Executed buy order at " << highestBuy->getPrice() << " and sell order at" << lowestSell->getPrice()
+    << std::endl;
 
+    // Update highest buy and lowest sell
+    highestBuy = highestBuy->parentLimit->getNextInsideOrder(true);
+    lowestSell = lowestSell->parentLimit->getNextInsideOrder(false);
+
+    // Print profit
+    std::cout << "Profit: " << this->profit << std::endl;
 }
 
 void OrderBook::getVolumeAtLimitPrice(float price) {

@@ -50,6 +50,8 @@ public:
     int currBuyOrdersId;
 
     int currSellOrdersId;
+
+    float profit;
 };
 
 

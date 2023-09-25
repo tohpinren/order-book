@@ -17,7 +17,7 @@ public:
 
     int getSize() const;
 
-    float getTotalVolume() const;
+    int getTotalVolume() const;
 
     Limit *getParent() const;
 
@@ -61,7 +61,7 @@ public:
 
     int size;
 
-    float totalVolume;
+    int totalVolume;
 
     Limit *parent;
 
