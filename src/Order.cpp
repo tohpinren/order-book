@@ -53,3 +53,8 @@ void Order::setNextOrder(Order *nextOrder) {
 void Order::setPrevOrder(Order *prevOrder) {
     this->prevOrder = prevOrder;
 }
+
+void Order::decreaseQuantity(int quantity) {
+    this->quantity -= quantity;
+    this->getParentLimit()->decreaseVolume(quantity);
+}

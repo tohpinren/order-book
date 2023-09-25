@@ -87,7 +87,7 @@ public:
 
     void increaseVolume(int volume);
 
-    void clearVolume();
+    void decreaseVolume(int volume);
 
     void setHeight(int height);
 

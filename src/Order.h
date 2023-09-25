@@ -47,6 +47,8 @@ public:
     Order *prevOrder;
 
     Limit *parentLimit;
+
+    void decreaseQuantity(int quantity);
 };
 
 

@@ -64,8 +64,8 @@ void Limit::increaseVolume(int volume) {
     this->totalVolume += volume;
 }
 
-void Limit::clearVolume() {
-    this->totalVolume = 0;
+void Limit::decreaseVolume(int volume) {
+    this->totalVolume -= volume;
 }
 
 void Limit::setParent(Limit *parent) {

@@ -168,23 +168,54 @@ void OrderBook::executeOrder() {
         std::cout << "There are no orders to execute." << std::endl;
         return;
     }
-    // Remove highest buy and lowest sell from limits
-    highestBuy->parentLimit->removeOrder(highestBuy);
-    lowestSell->parentLimit->removeOrder(lowestSell);
-    this->profit += lowestSell->getPrice() - highestBuy->getPrice();
 
-    // Remove highest buy and lowest sell from orders map
-    buyOrders->erase(highestBuy->getId());
-    sellOrders->erase(lowestSell->getId());
+    if (highestBuy->getQuantity() == lowestSell->getQuantity()) {
+        // Remove both from limits
+        highestBuy->parentLimit->removeOrder(highestBuy);
+        lowestSell->parentLimit->removeOrder(lowestSell);
+        this->profit += lowestSell->getPrice() - highestBuy->getPrice();
 
-    // Print orders executed
-    std::cout << "Executed buy order at " << highestBuy->getPrice() << " and sell order at" << lowestSell->getPrice()
-    << std::endl;
+        // Remove highest buy and lowest sell from orders map
+        buyOrders->erase(highestBuy->getId());
+        sellOrders->erase(lowestSell->getId());
 
-    // Update highest buy and lowest sell
-    highestBuy = highestBuy->parentLimit->getNextInsideOrder(true);
-    lowestSell = lowestSell->parentLimit->getNextInsideOrder(false);
+        // Print orders executed
+        std::cout << "Executed buy order at " << highestBuy->getPrice() << " and sell order at" <<
+            lowestSell->getPrice() << std::endl;
 
+        // Update highest buy and lowest sell
+        highestBuy = highestBuy->parentLimit->getNextInsideOrder(true);
+        lowestSell = lowestSell->parentLimit->getNextInsideOrder(false);
+    } else {
+        Order *lowerQuantity = highestBuy->getQuantity() < lowestSell->getQuantity() ? highestBuy : lowestSell;
+        Order *higherQuantity = highestBuy->getQuantity() < lowestSell->getQuantity() ? lowestSell : highestBuy;
+
+        // Remove lower quantity from limit and update higher quantity
+        lowerQuantity->parentLimit->removeOrder(lowerQuantity);
+        higherQuantity->decreaseQuantity(lowerQuantity->getQuantity());
+
+        if (lowerQuantity->isBuy()) {
+            // Remove lower quantity from orders map
+            buyOrders->erase(lowerQuantity->getId());
+
+            // Print orders executed, noting which is partial
+            std::cout << "Executed buy order at " << lowerQuantity->getPrice() << " and partial sell order at" <<
+                      higherQuantity->getPrice() << std::endl;
+
+            // Update highest buy
+            highestBuy = highestBuy->parentLimit->getNextInsideOrder(true);
+        } else {
+            // Remove lower quantity from orders map
+            sellOrders->erase(lowerQuantity->getId());
+
+            // Print orders executed, noting which is partial
+            std::cout << "Executed partial buy order at " << higherQuantity->getPrice() << " and sell order at" <<
+                      lowerQuantity->getPrice() << std::endl;
+
+            // Update lowest sell
+            lowestSell = lowestSell->parentLimit->getNextInsideOrder(false);
+        }
+    }
     // Print profit
     std::cout << "Profit: " << this->profit << std::endl;
 }
