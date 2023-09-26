@@ -135,7 +135,19 @@ void Limit::updateHeight() {
     Limit *curr = this->getParent();
 
     while (curr != nullptr) {
-        curr->setHeight(std::max(curr->getLeftChild()->getHeight(), curr->getRightChild()->getHeight()) + 1);
+        int leftHeight;
+        if (curr->getLeftChild() == nullptr) {
+            leftHeight = -1;
+        } else {
+            leftHeight = curr->getLeftChild()->getHeight();
+        }
+        int rightHeight;
+        if (curr->getRightChild() == nullptr) {
+            rightHeight = -1;
+        } else {
+            rightHeight = curr->getRightChild()->getHeight();
+        }
+        curr->setHeight(std::max(leftHeight, rightHeight) + 1);
         curr = curr->getParent();
     }
 }
@@ -284,7 +296,6 @@ void Limit::removeOrder(Order *order) {
     }
     this->size -= 1;
     this->totalVolume -= order->quantity;
-    order->parentLimit = nullptr;
 }
 
 Order *Limit::getNextInsideOrder(bool isBuy) {
@@ -297,10 +308,12 @@ Order *Limit::getNextInsideOrder(bool isBuy) {
          * It will not have any right children. Since tree is balanced, limit will have at most a height 0 left child.
          * Next highest buy limit will be either the parent or it's left child.
          */
-        if (this->leftChild == nullptr) {
+        if (this->leftChild != nullptr) {
+            return this->leftChild->getHeadOrder();
+        } else if (this->parent != nullptr) {
             return this->parent->getHeadOrder();
         } else {
-            return this->leftChild->getHeadOrder();
+            return nullptr;
         }
     } else {
         /*
@@ -308,10 +321,12 @@ Order *Limit::getNextInsideOrder(bool isBuy) {
          * It will not have any left children. Since tree is balanced, limit will have at most a height 0 right child.
          * Next lowest sell limit will be either the parent or it's right child.
          */
-        if (this->rightChild == nullptr) {
+        if (this->rightChild != nullptr) {
+            return this->rightChild->getHeadOrder();
+        } else if (this->parent != nullptr) {
             return this->parent->getHeadOrder();
         } else {
-            return this->rightChild->getHeadOrder();
+            return nullptr;
         }
     }
 }
