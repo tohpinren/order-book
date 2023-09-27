@@ -11,6 +11,8 @@ add_executable(OrderBook
         src/Order.cpp
         src/Order.h
         src/Limit.cpp
-        src/Limit.h)
+        src/Limit.h
+        src/doctest.cpp
+        src/doctest.h)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)

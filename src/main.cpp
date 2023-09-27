@@ -6,16 +6,15 @@
 #include "Order.h"
 #include "Limit.h"
 #include <iostream>
+#include "doctest.h"
 
 int main() {
-    OrderBook *orderBook = new OrderBook();
+    doctest::Context context;
+    int res = context.run();
 
-    orderBook->addOrder(100, 10, true);
-    orderBook->addOrder(90, 10, true);
-    orderBook->addOrder(110, 10, true);
-
-    orderBook->addOrder(100, 10, false);
-    orderBook->executeOrder();
+    // Test summary
+    if (context.shouldExit())
+        return res;
 
     return 0;
 }
