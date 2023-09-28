@@ -262,12 +262,22 @@ void OrderBook::executeOrder() {
  * Prints the total volume at a limit price. If limit price does not exist, prints error message.
  *
  * @param price Limit price to get volume at
+ * @param isBuy Boolean indicating to check buy or sell tree
  */
-void OrderBook::getVolumeAtLimitPrice(float price) {
-    if (this->buyLimits->find(price) == this->buyLimits->end()) {
-        std::cout << "There is no volume at this limit price." << std::endl;
-    } else {
+void OrderBook::getVolumeAtLimitPrice(float price, bool isBuy) {
+    if (isBuy) {
+        if (this->buyLimits->find(price) == this->buyLimits->end()) {
+            std::cout << "There is no buy volume at this limit price." << std::endl;
+            return;
+        }
         Limit *limit = this->buyLimits->at(price);
+        std::cout << limit->getTotalVolume() << std::endl;
+    } else {
+        if (this->sellLimits->find(price) == this->sellLimits->end()) {
+            std::cout << "There is no sell volume at this limit price." << std::endl;
+            return;
+        }
+        Limit *limit = this->sellLimits->at(price);
         std::cout << limit->getTotalVolume() << std::endl;
     }
 }

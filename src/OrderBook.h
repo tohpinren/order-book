@@ -99,8 +99,9 @@ public:
      * Getter for the volume at a given price.
      *
      * @param price Price to get volume at
+     * @param isBuy Boolean indicating to check buy or sell side
      */
-    void getVolumeAtLimitPrice(float price);
+    void getVolumeAtLimitPrice(float price, bool isBuy);
 
     /**
      * Getter for the best bid.
