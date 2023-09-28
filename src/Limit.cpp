@@ -6,6 +6,13 @@
 #include "OrderBook.h"
 #include "Order.h"
 
+/**
+ * Constructor for Limit.
+ *
+ * @param price Price of the limit
+ * @param isBuy Boolean indicating if the limit is a buy limit
+ * @param orderBook Pointer to the order book
+ */
 Limit::Limit(float price, bool isBuy, OrderBook *orderBook) {
     this->price = price;
     this->size = 0;
@@ -20,92 +27,174 @@ Limit::Limit(float price, bool isBuy, OrderBook *orderBook) {
     this->isBuy = isBuy;
 }
 
+/**
+ * Getter for size of the limit.
+ *
+ * @return Size of the limit
+ */
 int Limit::getSize() const {
     return size;
 }
 
+/**
+ * Getter for total volume of the limit.
+ *
+ * @return Total volume of the limit
+ */
 int Limit::getTotalVolume() const {
     return totalVolume;
 }
 
+/**
+ * Getter for pointer to the parent limit of the limit.
+ *
+ * @return Pointer to the parent limit of the limit
+ */
 Limit *Limit::getParent() const {
     return parent;
 }
 
+/**
+ * Getter for pointer to the left child of the limit.
+ *
+ * @return Pointer to the left child of the limit
+ */
 Limit *Limit::getLeftChild() const {
     return leftChild;
 }
 
+/**
+ * Getter for pointer to the right child of the limit.
+ *
+ * @return Pointer to the right child of the limit
+ */
 Limit *Limit::getRightChild() const {
     return rightChild;
 }
 
+/**
+ * Getter for pointer to the head order of the limit.
+ *
+ * @return Pointer to the head order of the limit
+ */
 Order *Limit::getHeadOrder() const {
     return headOrder;
 }
 
+/**
+ * Getter for pointer to the tail order of the limit.
+ *
+ * @return Pointer to the tail order of the limit
+ */
 Order *Limit::getTailOrder() const {
     return tailOrder;
 }
 
+/**
+ * Getter for the height of the limit.
+ *
+ * @return Height of the limit
+ */
 int Limit::getHeight() const {
     return height;
 }
 
-void Limit::increaseSize(int quantity) {
-    this->size += quantity;
+/**
+ * Getter for the price of the limit.
+ *
+ * @return Price of the limit
+ */
+float Limit::getPrice() const {
+    return price;
 }
 
-void Limit::decreaseSize(int quantity) {
-    this->size -= quantity;
+/**
+ * Increase the size of the limit by the given amount.
+ *
+ * @param amount Amount to increase the size by
+ */
+void Limit::increaseSize(int amount) {
+    this->size += amount;
 }
 
+/**
+ * Decrease the size of the limit by the given amount.
+ *
+ * @param amount Amount to decrease the size by
+ */
+void Limit::decreaseSize(int amount) {
+    this->size -= amount;
+}
+
+/**
+ * Increase the total volume of the limit by the given volume.
+ *
+ * @param volume Volume to increase the total volume by
+ */
 void Limit::increaseVolume(int volume) {
     this->totalVolume += volume;
 }
 
+/**
+ * Decrease the total volume of the limit by the given volume.
+ *
+ * @param volume Volume to decrease the total volume by
+ */
 void Limit::decreaseVolume(int volume) {
     this->totalVolume -= volume;
 }
 
-void Limit::setParent(Limit *parent) {
-    this->parent = parent;
+/**
+ * Setter for the parent limit of the limit.
+ *
+ * @param newParent New parent limit of the limit
+ */
+void Limit::setParent(Limit *newParent) {
+    this->parent = newParent;
 }
 
-void Limit::setLeftChild(Limit *leftChild) {
-    this->leftChild = leftChild;
+/**
+ * Setter for the left child of the limit.
+ *
+ * @param newLeftChild New left child of the limit
+ */
+void Limit::setLeftChild(Limit *newLeftChild) {
+    this->leftChild = newLeftChild;
 }
 
-void Limit::setRightChild(Limit *rightChild) {
-    this->rightChild = rightChild;
+/**
+ * Setter for the right child of the limit.
+ *
+ * @param newRightChild New right child of the limit
+ */
+void Limit::setRightChild(Limit *newRightChild) {
+    this->rightChild = newRightChild;
 }
 
-void Limit::setSize(int size) {
-
-}
-
-void Limit::setHeadOrder(Order *headOrder) {
-    this->headOrder = headOrder;
-}
-
-void Limit::setTailOrder(Order *tailOrder) {
-    this->tailOrder = tailOrder;
-}
-
+/**
+ * Add an order to the limit.
+ *
+ * @param order Order to add to the limit
+ */
 void Limit::addOrder(Order *order) {
-    if (headOrder == nullptr) {
-        headOrder = order;
-        tailOrder = order;
+    if (this->headOrder == nullptr) {
+        this->headOrder = order;
+        this->tailOrder = order;
     } else {
-        tailOrder->nextOrder = order;
-        order->prevOrder = tailOrder;
+        this->tailOrder->setNextOrder(order);
+        order->setPrevOrder(tailOrder);
         this->tailOrder = order;
     }
-    this->size += 1;
-    this->totalVolume += order->quantity;
-    order->parentLimit = this;
+    this->increaseSize(1);
+    this->increaseVolume(order->getQuantity());
+    order->setParentLimit(this);
 }
 
+/**
+ * Insert a limit into the limit AVL tree.
+ *
+ * @param limit Limit to insert into the limit AVL tree
+ */
 void Limit::insertLimit(Limit *limit) {
     if (limit->getPrice() < this->getPrice()) {
         if (this->getLeftChild() == nullptr) {
@@ -126,12 +215,19 @@ void Limit::insertLimit(Limit *limit) {
     }
 }
 
-void Limit::setHeight(int height) {
-    this->height = height;
+/**
+ * Setter for the height of the limit.
+ *
+ * @param newHeight New height of the limit
+ */
+void Limit::setHeight(int newHeight) {
+    this->height = newHeight;
 }
 
+/**
+ * Update the height of the limit.
+ */
 void Limit::updateHeight() {
-    int prevHeight = this->getHeight();
     Limit *curr = this->getParent();
 
     while (curr != nullptr) {
@@ -152,6 +248,9 @@ void Limit::updateHeight() {
     }
 }
 
+/**
+ * Rebalance the limit AVL tree on add.
+ */
 void Limit::rebalanceOnAdd() {
     // Find the first height unbalanced node
     Limit *curr = this->getParent();
@@ -189,42 +288,42 @@ void Limit::rebalanceOnAdd() {
     // If left heavy, check left child
     if (isLeftHeavy) {
         // If left child is equi-height or left heavy, right rotate
-        Limit *leftChild = curr->getLeftChild();
+        Limit *left = curr->getLeftChild();
         int leftLeftHeight;
         int leftRightHeight;
-        if (leftChild->getLeftChild() == nullptr) {
+        if (left->getLeftChild() == nullptr) {
             leftLeftHeight = -1;
         } else {
-            leftLeftHeight = leftChild->getLeftChild()->getHeight();
+            leftLeftHeight = left->getLeftChild()->getHeight();
         }
-        if (leftChild->getRightChild() == nullptr) {
+        if (left->getRightChild() == nullptr) {
             leftRightHeight = -1;
         } else {
-            leftRightHeight = leftChild->getRightChild()->getHeight();
+            leftRightHeight = left->getRightChild()->getHeight();
         }
         if (leftLeftHeight >= leftRightHeight) {
             curr->rightRotate();
         }
         // If left child is right heavy, left rotate left child then right rotate
         else {
-            leftChild->leftRotate();
+            left->leftRotate();
             curr->rightRotate();
         }
     }
     // If right heavy, check right child
     else {
-        Limit *rightChild = curr->getRightChild();
+        Limit *right = curr->getRightChild();
         int rightLeftHeight;
         int rightRightHeight;
-        if (rightChild->getLeftChild() == nullptr) {
+        if (right->getLeftChild() == nullptr) {
             rightLeftHeight = -1;
         } else {
-            rightLeftHeight = rightChild->getLeftChild()->getHeight();
+            rightLeftHeight = right->getLeftChild()->getHeight();
         }
-        if (rightChild->getRightChild() == nullptr) {
+        if (right->getRightChild() == nullptr) {
             rightRightHeight = -1;
         } else {
-            rightRightHeight = rightChild->getRightChild()->getHeight();
+            rightRightHeight = right->getRightChild()->getHeight();
         }
         // If right child is equi-height or right heavy, left rotate
         if (rightRightHeight >= rightLeftHeight) {
@@ -232,77 +331,93 @@ void Limit::rebalanceOnAdd() {
         }
         // If right child is left heavy, right rotate right child then left rotate
         else {
-            rightChild->rightRotate();
+            right->rightRotate();
             curr->leftRotate();
         }
     }
 }
 
+/**
+ * Left rotate the limit.
+ */
 void Limit::leftRotate() {
-    Limit *rightChild = this->getRightChild();
-    rightChild->parent = this->getParent();
-    this->parent = rightChild;
-    this->rightChild = rightChild->getLeftChild();
-    rightChild->leftChild = this;
+    Limit *right = this->getRightChild();
+    right->setParent(this->getParent());
+    this->parent = right;
+    this->rightChild = right->getLeftChild();
+    right->setLeftChild(this);
 
     // Update height
-    this->setHeight(std::max(this->getLeftChild()->getHeight(), this->getRightChild()->getHeight()) + 1);
-    rightChild->setHeight(std::max(rightChild->getLeftChild()->getHeight(), rightChild->getRightChild()->getHeight()) + 1);
+    this->setHeight(std::max(this->getLeftChild()->getHeight(),
+                             this->getRightChild()->getHeight()) + 1);
+    right->setHeight(std::max(right->getLeftChild()->getHeight(),
+                                   right->getRightChild()->getHeight()) + 1);
 
     // Update root
     if (this->orderBook->getBuyTree() == this) {
-        this->orderBook->setBuyTree(rightChild);
+        this->orderBook->setBuyTree(right);
     } else if (this->orderBook->getSellTree() == this) {
-        this->orderBook->setSellTree(rightChild);
+        this->orderBook->setSellTree(right);
     }
 }
 
+/**
+ * Right rotate the limit.
+ */
 void Limit::rightRotate() {
-    Limit *leftChild = this->getLeftChild();
-    leftChild->parent = this->getParent();
-    this->parent = leftChild;
-    this->leftChild = leftChild->getRightChild();
-    leftChild->rightChild = this;
+    Limit *left = this->getLeftChild();
+    left->setParent(this->getParent());
+    this->parent = left;
+    this->leftChild = left->getRightChild();
+    left->rightChild = this;
 
     // Update height
-    this->setHeight(std::max(this->getLeftChild()->getHeight(), this->getRightChild()->getHeight()) + 1);
-    leftChild->setHeight(std::max(leftChild->getLeftChild()->getHeight(), leftChild->getRightChild()->getHeight()) + 1);
+    this->setHeight(std::max(this->getLeftChild()->getHeight(),
+                             this->getRightChild()->getHeight()) + 1);
+    left->setHeight(std::max(left->getLeftChild()->getHeight(),
+                                  left->getRightChild()->getHeight()) + 1);
 
     // Update root
     if (this->orderBook->getBuyTree() == this) {
-        this->orderBook->setBuyTree(leftChild);
+        this->orderBook->setBuyTree(left);
     } else if (this->orderBook->getSellTree() == this) {
-        this->orderBook->setSellTree(leftChild);
+        this->orderBook->setSellTree(left);
     }
 }
 
-float Limit::getPrice() const {
-    return price;
-}
-
+/**
+ * Remove an order from the limit.
+ *
+ * @param order Order to remove from the limit
+ */
 void Limit::removeOrder(Order *order) {
     if (this->headOrder == order && this->tailOrder == order) {
-        this->headOrder = nullptr;
-        this->tailOrder = nullptr;
+        this->setHeadOrder(nullptr);
+        this->setTailOrder(nullptr);
     } else if (this->headOrder == order) {
-        this->headOrder = order->nextOrder;
-        order->nextOrder->prevOrder = nullptr;
+        this->setHeadOrder(order->getNextOrder());
+        order->getNextOrder()->setPrevOrder(nullptr);
     } else if (this->tailOrder == order) {
-        this->tailOrder = order->prevOrder;
-        order->prevOrder->nextOrder = nullptr;
+        this->setTailOrder(order->getPrevOrder());
+        order->getPrevOrder()->setNextOrder(nullptr);
     } else {
-        order->prevOrder->nextOrder = order->nextOrder;
-        order->nextOrder->prevOrder = order->prevOrder;
+        order->getPrevOrder()->setNextOrder(order->getNextOrder());
+        order->getNextOrder()->setPrevOrder(order->getPrevOrder());
     }
-    this->size -= 1;
-    this->totalVolume -= order->quantity;
+    this->decreaseSize(1);
+    this->increaseVolume(order->getQuantity());
 }
 
-Order *Limit::getNextInsideOrder(bool isBuy) {
+/**
+ * Getter for the next inside order in the order book.
+ *
+ * @return Next inside order in the order book
+ */
+Order *Limit::getNextInsideOrder() const {
     if (this->headOrder != nullptr) {
         return this->headOrder;
     }
-    if (isBuy) {
+    if (this->isBuy) {
         /*
          * Find next highest buy limit. If limit contained highest order, it must be the bottom right of the tree.
          * It will not have any right children. Since tree is balanced, limit will have at most a height 0 left child.
@@ -329,4 +444,22 @@ Order *Limit::getNextInsideOrder(bool isBuy) {
             return nullptr;
         }
     }
+}
+
+/**
+ * Setter for pointer to the head order of the limit.
+ *
+ * @param newHeadOrder New pointer to the head order of the limit
+ */
+void Limit::setHeadOrder(Order *newHeadOrder) {
+    this->headOrder = newHeadOrder;
+}
+
+/**
+ * Setter for pointer to the tail order of the limit.
+ *
+ * @param newTailOrder New pointer to the tail order of the limit
+ */
+void Limit::setTailOrder(Order *newTailOrder) {
+    this->tailOrder = newTailOrder;
 }

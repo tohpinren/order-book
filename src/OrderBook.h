@@ -9,49 +9,131 @@
 #include "Order.h"
 #include "Limit.h"
 
+/**
+ * Class representing the order book.
+ */
 class OrderBook {
-public:
-    OrderBook();
-
-    void addOrder(float price, int quantity, bool isBuy);
-
-    void cancelOrder(Order *order);
-
-    void executeOrder();
-
-    void getVolumeAtLimitPrice(float price);
-
-    void getBestBid();
-
-    Limit *getBuyTree();
-
-    Limit *getSellTree();
-
-    void setBuyTree(Limit *buyTree);
-
-    void setSellTree(Limit *sellTree);
-
+private:
+    /**
+     * Pointer to the root of the buy limit AVL tree.
+     */
     Limit *buyTree;
 
+    /**
+     * Pointer to the root of the sell limit AVL tree.
+     */
     Limit *sellTree;
 
+    /**
+     * Pointer to the lowest sell order.
+     */
     Order *lowestSell;
 
+    /**
+     * Pointer to the highest buy order.
+     */
     Order *highestBuy;
 
+    /**
+     * Map of buy orders.
+     */
     std::unordered_map<int, Order *> *buyOrders;
 
+    /**
+     * Map of sell orders.
+     */
     std::unordered_map<int, Order *> *sellOrders;
 
+    /**
+     * Map of buy limits.
+     */
     std::unordered_map<float, Limit *> *buyLimits;
 
+    /**
+     * Map of sell limits.
+     */
     std::unordered_map<float, Limit *> *sellLimits;
 
+    /**
+     * ID of the next buy order.
+     */
     int currBuyOrdersId;
 
+    /**
+     * ID of the next sell order.
+     */
     int currSellOrdersId;
 
+    /**
+     * Current total profits of the order book.
+     */
     float profit;
+public:
+    /**
+     * Constructor for OrderBook.
+     */
+    OrderBook();
+
+    /**
+     * Add order to the order book.
+     *
+     * @param price Price of the order
+     * @param quantity Quantity of the order
+     * @param isBuy Boolean indicating if the order is a buy order
+     */
+    void addOrder(float price, int quantity, bool isBuy);
+
+    /**
+     * Cancel order in the order book.
+     *
+     * @param order Order to cancel
+     */
+    void cancelOrder(Order *order);
+
+    /**
+     * Execute order in the order book.
+     */
+    void executeOrder();
+
+    /**
+     * Getter for the volume at a given price.
+     *
+     * @param price Price to get volume at
+     */
+    void getVolumeAtLimitPrice(float price);
+
+    /**
+     * Getter for the best bid.
+     */
+    void getBestBid();
+
+    /**
+     * Getter for limit buy tree.
+     *
+     * @return Limit buy tree
+     */
+    Limit *getBuyTree();
+
+    /**
+     * Getter for limit sell tree.
+     *
+     * @return Limit sell tree
+     */
+    Limit *getSellTree();
+
+    /**
+     * Setter for limit buy tree.
+     *
+     * @param buyTree New limit buy tree
+     */
+    void setBuyTree(Limit *buyTree);
+
+    /**
+     * Setter for limit sell tree.
+     *
+     * @param sellTree New limit sell tree
+     */
+    void setSellTree(Limit *sellTree);
 };
 
 

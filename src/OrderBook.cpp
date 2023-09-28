@@ -9,6 +9,9 @@
 #include <unordered_map>
 #include <iostream>
 
+/**
+ * Constructor for OrderBook.
+ */
 OrderBook::OrderBook() {
     this->buyTree = nullptr;
     this->sellTree = nullptr;
@@ -23,22 +26,49 @@ OrderBook::OrderBook() {
     this->profit = 0;
 }
 
+/**
+ * Getter for buy limit tree.
+ *
+ * @return Buy limit tree
+ */
 Limit *OrderBook::getBuyTree() {
     return this->buyTree;
 }
 
+/**
+ * Getter for sell limit tree.
+ *
+ * @return Sell limit tree
+ */
 Limit *OrderBook::getSellTree() {
     return this->sellTree;
 }
 
-void OrderBook::setBuyTree(Limit *buyTree) {
-    this->buyTree = buyTree;
+/**
+ * Setter for buy limit tree.
+ *
+ * @param newBuyTree New buy limit tree
+ */
+void OrderBook::setBuyTree(Limit *newBuyTree) {
+    this->buyTree = newBuyTree;
 }
 
-void OrderBook::setSellTree(Limit *sellTree) {
-    this->sellTree = sellTree;
+/**
+ * Setter for sell limit tree.
+ *
+ * @param newSellTree New sell limit tree
+ */
+void OrderBook::setSellTree(Limit *newSellTree) {
+    this->sellTree = newSellTree;
 }
 
+/**
+ * Adds an order to the order book. If limit price does not exist, creates new limit. Else, adds order to limit.
+ *
+ * @param price Price of the order
+ * @param quantity Quantity of the order
+ * @param isBuy Boolean indicating if the order is a buy order
+ */
 void OrderBook::addOrder(float price, int quantity, bool isBuy) {
     time_t timeNow = time(0);
     if (isBuy) {
@@ -112,7 +142,7 @@ void OrderBook::addOrder(float price, int quantity, bool isBuy) {
  * Cancels an order by removing from Limit. If order does not exist, prints error message.
  * If Limit is empty, Limit is not removed because assuming high volume of orders, Limit will be filled again.
  *
- * @param order Order to be cancelled.
+ * @param order Order to be cancelled
  */
 void OrderBook::cancelOrder(Order *order) {
     if (order->isBuy()) {
@@ -131,7 +161,7 @@ void OrderBook::cancelOrder(Order *order) {
 
         // If order is highest buy, update highest buy
         if (order == highestBuy) {
-            highestBuy = limit->getNextInsideOrder(true);
+            highestBuy = limit->getNextInsideOrder();
         }
 
         // Remove order from orders map
@@ -152,7 +182,7 @@ void OrderBook::cancelOrder(Order *order) {
 
         // If order is lowest sell, update lowest sell
         if (order == lowestSell) {
-            lowestSell = limit->getNextInsideOrder(false);
+            lowestSell = limit->getNextInsideOrder();
         }
 
         // Remove order from orders map
@@ -160,7 +190,7 @@ void OrderBook::cancelOrder(Order *order) {
     }
 }
 
-/*
+/**
  * Executes an order if highest buy is greater than or equal to lowest sell.
  */
 void OrderBook::executeOrder() {
@@ -171,8 +201,8 @@ void OrderBook::executeOrder() {
 
     if (highestBuy->getQuantity() == lowestSell->getQuantity()) {
         // Remove both from limits
-        highestBuy->parentLimit->removeOrder(highestBuy);
-        lowestSell->parentLimit->removeOrder(lowestSell);
+        highestBuy->getParentLimit()->removeOrder(highestBuy);
+        lowestSell->getParentLimit()->removeOrder(lowestSell);
         this->profit += (highestBuy->getPrice() - lowestSell->getPrice()) * highestBuy->getQuantity();
 
         // Remove highest buy and lowest sell from orders map
@@ -184,14 +214,14 @@ void OrderBook::executeOrder() {
             lowestSell->getPrice() << std::endl;
 
         // Update highest buy and lowest sell
-        highestBuy = highestBuy->parentLimit->getNextInsideOrder(true);
-        lowestSell = lowestSell->parentLimit->getNextInsideOrder(false);
+        highestBuy = highestBuy->getParentLimit()->getNextInsideOrder();
+        lowestSell = lowestSell->getParentLimit()->getNextInsideOrder();
     } else {
         Order *lowerQuantity = highestBuy->getQuantity() < lowestSell->getQuantity() ? highestBuy : lowestSell;
         Order *higherQuantity = highestBuy->getQuantity() < lowestSell->getQuantity() ? lowestSell : highestBuy;
 
         // Remove lower quantity from limit and update higher quantity
-        lowerQuantity->parentLimit->removeOrder(lowerQuantity);
+        lowerQuantity->getParentLimit()->removeOrder(lowerQuantity);
         higherQuantity->decreaseQuantity(lowerQuantity->getQuantity());
 
         if (lowerQuantity->isBuy()) {
@@ -203,10 +233,10 @@ void OrderBook::executeOrder() {
                       higherQuantity->getPrice() << std::endl;
 
             // Update highest buy
-            highestBuy = highestBuy->parentLimit->getNextInsideOrder(true);
+            highestBuy = highestBuy->getParentLimit()->getNextInsideOrder();
 
             // Update profit
-            // Buy > Sell, lower quantity is buy
+            // Buy > Sell, lower quantity is the buy order
             this->profit += (lowerQuantity->getPrice() - higherQuantity->getPrice()) * lowerQuantity->getQuantity();
         } else {
             // Remove lower quantity from orders map
@@ -217,10 +247,10 @@ void OrderBook::executeOrder() {
                       lowerQuantity->getPrice() << std::endl;
 
             // Update lowest sell
-            lowestSell = lowestSell->parentLimit->getNextInsideOrder(false);
+            lowestSell = lowestSell->getParentLimit()->getNextInsideOrder();
 
             // Update profit
-            // Buy > Sell, higher quantity is buy
+            // Buy > Sell, higher quantity is the buy order
             this->profit += (higherQuantity->getPrice() - lowerQuantity->getPrice()) * lowerQuantity->getQuantity();
         }
     }
@@ -228,6 +258,11 @@ void OrderBook::executeOrder() {
     std::cout << "Profit: " << this->profit << std::endl;
 }
 
+/**
+ * Prints the total volume at a limit price. If limit price does not exist, prints error message.
+ *
+ * @param price Limit price to get volume at
+ */
 void OrderBook::getVolumeAtLimitPrice(float price) {
     if (this->buyLimits->find(price) == this->buyLimits->end()) {
         std::cout << "There is no volume at this limit price." << std::endl;
@@ -237,6 +272,9 @@ void OrderBook::getVolumeAtLimitPrice(float price) {
     }
 }
 
+/**
+ * Prints the best ask price. If there is no best ask price, prints error message.
+ */
 void OrderBook::getBestBid() {
     if (this->highestBuy == nullptr) {
         std::cout << "There is no best bid." << std::endl;
