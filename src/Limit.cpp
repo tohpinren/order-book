@@ -405,7 +405,7 @@ void Limit::removeOrder(Order *order) {
         order->getNextOrder()->setPrevOrder(order->getPrevOrder());
     }
     this->decreaseSize(1);
-    this->increaseVolume(order->getQuantity());
+    this->decreaseVolume(order->getQuantity());
 }
 
 /**
