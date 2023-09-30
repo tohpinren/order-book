@@ -359,35 +359,7 @@ void Limit::leftRotate() {
     }
     right->setLeftChild(this);
 
-    // Update height
     this->updateHeight();
-//    int leftChildHeight;
-//    if (this->getLeftChild() == nullptr) {
-//        leftChildHeight = -1;
-//    } else {
-//        leftChildHeight = this->getLeftChild()->getHeight();
-//    }
-//    int rightChildHeight;
-//    if (this->getRightChild() == nullptr) {
-//        rightChildHeight = -1;
-//    } else {
-//        rightChildHeight = this->getRightChild()->getHeight();
-//    }
-//    this->setHeight(std::max(leftChildHeight, rightChildHeight) + 1);
-//
-//    int rightLeftChildHeight;
-//    if (right->getLeftChild() == nullptr) {
-//        rightLeftChildHeight = -1;
-//    } else {
-//        rightLeftChildHeight = right->getLeftChild()->getHeight();
-//    }
-//    int rightRightChildHeight;
-//    if (right->getRightChild() == nullptr) {
-//        rightRightChildHeight = -1;
-//    } else {
-//        rightRightChildHeight = right->getRightChild()->getHeight();
-//    }
-//    right->setHeight(std::max(rightLeftChildHeight, rightRightChildHeight) + 1);
 
     // Update root
     if (this->orderBook->getBuyTree() == this) {
@@ -417,36 +389,7 @@ void Limit::rightRotate() {
     }
     left->setRightChild(this);
 
-    // Update height
     this->updateHeight();
-//    int leftChildHeight;
-//    if (this->getLeftChild() == nullptr) {
-//        leftChildHeight = -1;
-//    } else {
-//        leftChildHeight = this->getLeftChild()->getHeight();
-//    }
-//    int rightChildHeight;
-//    if (this->getRightChild() == nullptr) {
-//        rightChildHeight = -1;
-//    } else {
-//        rightChildHeight = this->getRightChild()->getHeight();
-//    }
-//
-//    this->setHeight(std::max(leftChildHeight, rightChildHeight) + 1);
-//
-//    int leftLeftChildHeight;
-//    if (left->getLeftChild() == nullptr) {
-//        leftLeftChildHeight = -1;
-//    } else {
-//        leftLeftChildHeight = left->getLeftChild()->getHeight();
-//    }
-//    int leftRightChildHeight;
-//    if (left->getRightChild() == nullptr) {
-//        leftRightChildHeight = -1;
-//    } else {
-//        leftRightChildHeight = left->getRightChild()->getHeight();
-//    }
-//    left->setHeight(std::max(leftLeftChildHeight, leftRightChildHeight) + 1);
 
     // Update root
     if (this->orderBook->getBuyTree() == this) {
