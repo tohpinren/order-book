@@ -69,8 +69,8 @@ void OrderBook::setSellTree(Limit *newSellTree) {
  * @param quantity Quantity of the order
  * @param isBuy Boolean indicating if the order is a buy order
  */
-void OrderBook::addOrder(float price, int quantity, bool isBuy) {
-    time_t timeNow = time(0);
+Order *OrderBook::addOrder(float price, int quantity, bool isBuy) {
+    time_t timeNow = time(nullptr);
     if (isBuy) {
         Order *newOrder = new Order(currBuyOrdersId, price, quantity, isBuy, timeNow);
         buyOrders->insert(std::make_pair(currBuyOrdersId, newOrder));
@@ -103,6 +103,7 @@ void OrderBook::addOrder(float price, int quantity, bool isBuy) {
 
         // Print order added
         std::cout << "Buy order added: " << newOrder->getId() << " at " << newOrder->getPrice() << std::endl;
+        return newOrder;
     } else {
         Order *newOrder = new Order(currSellOrdersId, price, quantity, isBuy, timeNow);
         sellOrders->insert(std::make_pair(currSellOrdersId, newOrder));
@@ -135,6 +136,7 @@ void OrderBook::addOrder(float price, int quantity, bool isBuy) {
 
         // Print order added
         std::cout << "Sell order added: " << newOrder->getId() << " at " << newOrder->getPrice() << std::endl;
+        return newOrder;
     }
 }
 

@@ -81,7 +81,7 @@ public:
      * @param quantity Quantity of the order
      * @param isBuy Boolean indicating if the order is a buy order
      */
-    void addOrder(float price, int quantity, bool isBuy);
+    Order *addOrder(float price, int quantity, bool isBuy);
 
     /**
      * Cancel order in the order book.
