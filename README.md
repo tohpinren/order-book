@@ -7,8 +7,8 @@ The Limit Order Book is a very important and fundamental component of a trading 
 I built this because I was interested in how HFTs build efficient trading systems using data structures and to learn C++.
 
 ## Project Requirements and Dependencies
-C++ 17
-Doctest
+- C++ 17
+- Doctest
 
 ```
 "There are three main operations that a limit order book (LOB) has to
