@@ -1,6 +1,5 @@
 # Fast Limit Order Book
 
-## Description
 Limit Order Book for high-frequency trading (HFT), as described by WK Selph, implemented in C++. Based on WK Selph's [blogpost](https://web.archive.org/web/20110219163448/http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/) that was deleted.
 
 The Limit Order Book is a very important and fundamental component of a trading system. It is a record of outstanding limit orders maintained by the security specialist who works at the exchange. A limit order is a type of order to buy or sell a security at a specific price or better. A buy limit order is an order to buy at a preset price or lower while a sell limit order is an order to sell a security at a pre-specified price or higher. When a limit order for a security is entered, it is kept on record by the security specialist. As buy and sell limit orders for the security are given, the specialist keeps a record of all of these orders in the order book. The specialist executes the orders at or better than the given limit price when the market moves to the pre-specified price.
@@ -9,6 +8,7 @@ I built this because I was interested in how HFTs build efficient trading system
 
 ## Project Requirements and Dependencies
 C++ 17
+Doctest
 
 ```
 "There are three main operations that a limit order book (LOB) has to
